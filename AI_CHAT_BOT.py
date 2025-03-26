@@ -5,21 +5,11 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.memory import ConversationBufferMemory, ConversationSummaryMemory, ConversationBufferWindowMemory
 from langchain.chains import ConversationChain
 
-# ✅ Load environment variables
 dotenv.load_dotenv()
 
-# ✅ Fetch API Key and Gemini Model
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
-# ✅ Check API Key
-if not GOOGLE_API_KEY:
-    raise ValueError("⚠️ GOOGLE_API_KEY is missing! Set it in a .env file or manually.")
-
-# ✅ Initialize AI Model
-llm = ChatGoogleGenerativeAI(model=GEMINI_MODEL, temperature=0.7, google_api_key=GOOGLE_API_KEY)
-
-# ✅ Define General AI Chatbot Prompt Template
 TEMPLATE = """
 You are an advanced AI assistant designed to provide **intelligent, structured, and well-explained answers** to users. Your goal is to help users with different types of queries.
 
@@ -55,31 +45,27 @@ You are an advanced AI assistant designed to provide **intelligent, structured, 
 - Adapt the tone based on the use case (friendly, professional, or educational).
 """
 
-# ✅ Create a Prompt Template
 prompt = PromptTemplate.from_template(TEMPLATE)
 
-# ✅ Select Memory Based on Use Case
 USE_CASE = "education"  # Change this to "chatbot", "customer_support", or "healthcare"
 
 if USE_CASE == "chatbot":
-    memory = ConversationBufferMemory(memory_key="history")  # ✅ Remembers everything
+    memory = ConversationBufferMemory(memory_key="history")  
 elif USE_CASE == "customer_support":
-    memory = ConversationBufferMemory(memory_key="history")  # ✅ Keeps full chat history
+    memory = ConversationBufferMemory(memory_key="history")  
 elif USE_CASE == "education":
-    memory = ConversationSummaryMemory(memory_key="history", llm=llm)  # ✅ Summarizes past chats
+    memory = ConversationSummaryMemory(memory_key="history", llm=llm) 
 elif USE_CASE == "healthcare":
-    memory = ConversationBufferWindowMemory(memory_key="history", k=3)  # ✅ Remembers last 3 messages only
+    memory = ConversationBufferWindowMemory(memory_key="history", k=3) 
 else:
-    memory = ConversationBufferMemory(memory_key="history")  # Default memory
+    memory = ConversationBufferMemory(memory_key="history") 
 
-# ✅ Attach Memory to Conversation Chain
 conversation = ConversationChain(
     llm=llm,
     memory=memory,
     prompt=prompt
 )
 
-# ✅ Start Chat Loop
 print("🤖 AI Chatbot is ready! Type 'exit' to stop.\n")
 
 while True:
